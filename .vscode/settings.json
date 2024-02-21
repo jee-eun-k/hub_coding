@@ -1,0 +1,7 @@
+{
+    "eslint.onIgnoredFiles": "off",
+    "eslint.nodeEnv": "",
+    "accessibility.alert.error": true,
+    "audioCues.lineHasError": "off",
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+}
