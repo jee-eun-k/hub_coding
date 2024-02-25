@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "dbstart": "npx json-server ./src/api/post/db.json --port 4000",
     "start": "next start",
     "lint": "next lint"
   },
