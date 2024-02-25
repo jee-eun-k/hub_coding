@@ -8,6 +8,7 @@ import { getPosts } from "@/api/route";
 import { useRecoilState, useResetRecoilState } from "recoil";
 import { postState, postListState } from "@/store/state";
 import styles from "../../page.module.css";
+
 const itemsPerPage = 5;
 
 export default function Main() {
@@ -22,14 +23,19 @@ export default function Main() {
   const currentItems = posts.slice(itemOffset, endOffset);
   const pageCount = Math.ceil(posts.length / itemsPerPage);
 
-  const getPostsData = async () => {
-    await getPosts()
-      .then((response) => response.json())
-      .then((data) => setPosts(data.data))
-      .catch((error) => alert(error));
+  const listItems = () => {
+    return currentItems.map((item) => (
+      <Title key={item.id} post={{ id: item.id, post: item.post }} />
+    ));
   };
 
   useEffect(() => {
+    const getPostsData = async () => {
+      await getPosts()
+        .then((response) => response.json())
+        .then((data) => setPosts(() => data.data))
+        .catch((error) => alert(error));
+    };
     getPostsData();
   }, []);
 
@@ -72,12 +78,7 @@ export default function Main() {
         className={styles.ReactPaginate}
         style={{ width: "100%", listStyleType: "none" }}
       >
-        {currentItems.length > 0 &&
-          currentItems.map((item) => {
-            return (
-              <Title key={item.id} post={{ id: item.id, post: item.post }} />
-            );
-          })}
+        {listItems()}
       </ul>
       <div
         style={{
