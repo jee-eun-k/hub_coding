@@ -3,6 +3,7 @@ export const SERVER_URI = "http://localhost:4000/result";
 export async function getPosts() {
   const res = await fetch(`${SERVER_URI}`, {
     method: "GET",
+    cache: "no-store",
   });
   const data = await res.json();
   return Response.json({ data });
@@ -16,8 +17,7 @@ export async function addPost(post) {
     }),
   });
   const data = await res.json();
-  const response = Response.json({ data });
-  return data
+  return data;
 }
 
 export async function editPost(post) {
