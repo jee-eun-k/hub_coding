@@ -15,3 +15,15 @@ ul.pagination-list li.pagination-active {
   color: black;
   font-weight: 700;
 }
+
+/***************** COMMON *****************/
+
+.line-space-break {
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.link {
+  text-decoration: underline;
+  cursor: pointer;
+}
