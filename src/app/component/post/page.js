@@ -4,13 +4,13 @@ import { useRouter } from "next/navigation";
 import { addPost, editPost } from "@/api/route";
 import { postState, postListState } from "@/store/state";
 import { useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useRecoilState } from "recoil";
 import reactStringReplace from "react-string-replace";
 
 export default function Post() {
   const router = useRouter();
 
-  const post = useRecoilValue(postState);
+  const [post, setPost] = useRecoilState(postState);
   const posts = useRecoilValue(postListState);
 
   const [id, setId] = useState(post.id);
@@ -19,37 +19,42 @@ export default function Post() {
   const [mode, setMode] = useState("read");
 
   const getLinkedContent = () => {
-    const replaced = (context, keyword) =>
-      reactStringReplace(post, keyword, (match, i) => (
-        <span style={{ color: "red" }}>{match}</span>
-      ));
-
-      console.log(posts)
-    const text = posts.map((post) => {
+    let originalText = content;
+    posts.map((post) => {
       const keyword = post.post.title;
-      // return replaced(prev, curr.post.title);
+      if (post.id !== id) {
+        originalText = reactStringReplace(originalText, keyword, (_, idx) => (
+          <a
+            key={`${keyword}_${idx}`}
+            style={{ textDecoration: "underline", cursor: "pointer" }}
+            onClick={() => setPost(post)}
+          >
+            {keyword}
+          </a>
+        ));
+      }
     });
+    return <div>{originalText}</div>;
   };
 
   useEffect(() => {
-    posts.map((post) => {
-      const postTitle = post.post.title;
-      // console.log(postTitle);
-    });
-  }, [posts]);
-
-  useEffect(() => {
-    console.log("id", id === undefined, id === "");
-  }, []);
+    setId(post.id);
+    setTitle(post.post.title);
+    setContent(post.post.content);
+  }, [post]);
 
   return (
     <>
       <button
         onClick={() => {
-          router.push("/");
+          if (id && mode === "edit") {
+            setMode(() => "read");
+          } else {
+            router.push("/");
+          }
         }}
       >
-        뒤로
+        {id && mode === "edit" ? "취소" : "목록"}
       </button>
 
       <div
@@ -62,29 +67,41 @@ export default function Post() {
           flexDirection: "column",
         }}
       >
-        {mode === "read" ? (
-          <>
-            <div>{title}</div>
-            {getLinkedContent()}
-          </>
-        ) : (
-          <>
-            <input
-              onChange={(event) => {
-                setTitle(event.target.value);
-              }}
-              value={title}
-            />
-            <textarea
-              style={{ height: "20vh" }}
-              value={content}
-              onChange={(event) => {
-                setContent(event.target.value);
-              }}
-              // disabled={true}
-            />
-          </>
-        )}
+        {
+          <div style={{ width: "60vw" }}>
+            <div style={{ width: "100%" }}>
+              <label htmlFor="post-id" style={{ marginRight: "10px" }}>
+                제목
+              </label>
+              <input
+                id="post-id"
+                style={{ width: "90%" }}
+                value={title}
+                disabled={id && mode === "read"}
+                maxLength={70}
+                onChange={(event) => {
+                  setTitle(event.target.value);
+                }}
+              />
+            </div>
+            <div style={{ width: "100%", display: 'flex' }}>
+              <label htmlFor="post-content" style={{ marginRight: "10px" }}>
+                내용
+              </label>
+              <textarea
+                id="post-content"
+                style={{ height: "20vh", width: "90%", resize: "none" }}
+                value={content}
+                disabled={id && mode === "read"}
+                readOnly={id && mode === "read"}
+                maxLength={800}
+                onChange={(event) => {
+                  setContent(event.target.value);
+                }}
+              />
+            </div>
+          </div>
+        }
       </div>
       <div>
         {id && mode === "read" ? (
@@ -98,9 +115,6 @@ export default function Post() {
             {"수정모드"}
           </button>
         ) : (
-          <></>
-        )}
-        {mode === "edit" ? (
           <button
             onClick={async () => {
               if (id) {
@@ -109,46 +123,29 @@ export default function Post() {
                   title: title,
                   content: content,
                 }).then((response) => {
-                  alert(response.status === 200 ? "수정 성공" : "수정 실패");
-                  router.push("/");
+                  if (response.status === 200) {
+                    alert("수정 성공");
+                    router.push("/");
+                  } else {
+                    alert("수정 실패");
+                  }
                 });
               } else {
                 await addPost({
                   title: title,
                   content: content,
                 }).then((response) => {
-                  alert(response.status === 200 ? "등록 성공" : "등록 실패");
-                  router.push("/");
+                  if (response.status === 200) {
+                    alert("등록 성공");
+                    router.push("/");
+                  } else {
+                    alert("등록 실패");
+                  }
                 });
               }
             }}
           >
-            {id ? "저장" : "등록"}
-          </button>
-        ) : (
-          <button
-            onClick={async () => {
-              if (id) {
-                await editPost({
-                  id: post.id,
-                  title: title,
-                  content: content,
-                }).then((response) => {
-                  alert(response.status === 200 ? "수정 성공" : "수정 실패");
-                  router.push("/");
-                });
-              } else {
-                await addPost({
-                  title: title,
-                  content: content,
-                }).then((response) => {
-                  alert(response.status === 200 ? "등록 성공" : "등록 실패");
-                  router.push("/");
-                });
-              }
-            }}
-          >
-            {id ? "저장" : "등록"}
+            {"저장"}
           </button>
         )}
       </div>
