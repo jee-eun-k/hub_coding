@@ -24,6 +24,6 @@
 
 # 실행 방법
 
-* db 실행: npm run dbstart
+* json server 실행: npm run jsonstart
 * 서버 실행: npm run start
 * 확인: [http://localhost:3000](http://localhost:3000)
