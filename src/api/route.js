@@ -16,7 +16,8 @@ export async function addPost(post) {
     }),
   });
   const data = await res.json();
-  return Response.json({ data });
+  const response = Response.json({ data });
+  return data
 }
 
 export async function editPost(post) {
