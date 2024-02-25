@@ -1,5 +1,4 @@
-// export const SERVER_URI = 'http://localhost:4000' // defaults to auto
-export const SERVER_URI = "http://192.168.0.34:4000/result"; // defaults to auto
+export const SERVER_URI = "http://localhost:4000/result";
 
 export async function getPosts() {
   const res = await fetch(`${SERVER_URI}`, {
